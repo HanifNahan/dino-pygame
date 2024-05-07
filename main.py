@@ -1,4 +1,4 @@
-import pygame, time
+import pygame
 
 pygame.init()
 
@@ -18,7 +18,6 @@ rect_change_x = 0
 rect_change_y = 0
 
 platform_y = WINDOW_HEIGHT - 50
-# time.sleep(2)
 
 running = True
 while running:
