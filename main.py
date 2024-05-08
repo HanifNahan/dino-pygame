@@ -2,67 +2,73 @@ import pygame
 
 pygame.init()
 
-WINDOW_WIDTH = 720
-WINDOW_HEIGHT = 480
+WINDOW_WIDTH, WINDOW_HEIGHT = 720, 480
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
-BLACK = (0, 0, 0)
-WHITE = (255, 255, 255)
-GRAVITY = 0.5
-SPEED = 5
-JUMP_SPEED = 10
-
-rect_x = 100
-rect_y = 100
-rect_change_x = 0
-rect_change_y = 0
+BLACK, WHITE = (0, 0, 0), (255, 255, 255)
+GRAVITY, SPEED, JUMP_SPEED = 0.5, 5, 10
 
 platform_y = WINDOW_HEIGHT - 50
+
+class Player(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([50, 50])
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect(topleft=(100, 100))
+        self.change = [0, 0]
+
+    def update(self):
+        self.rect.x += self.change[0]
+        self.change[1] += GRAVITY
+        self.rect.y += self.change[1]
+        if self.rect.y + 50 >= platform_y:
+            self.rect.y = platform_y - 50 - 1
+            self.change[1] = 0
+        if self.rect.y < 0:
+            self.rect.y = 0
+            self.change[1] = 0
+        if self.rect.x < 0:
+            self.rect.x = 0
+        if self.rect.x + 50 >= WINDOW_WIDTH:
+            self.rect.x = WINDOW_WIDTH - 50
+
+    def jump(self):
+        self.change[1] = -JUMP_SPEED
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+    def handle_key_press(self, key):
+        if key == pygame.K_LEFT:
+            self.change[0] = -SPEED
+        elif key == pygame.K_RIGHT:
+            self.change[0] = SPEED
+        elif key == pygame.K_SPACE:
+            self.jump()
+
+    def handle_key_release(self, key):
+        if key in (pygame.K_LEFT, pygame.K_RIGHT):
+            self.change[0] = 0
+
+player = Player()
 
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
-                rect_change_x = -SPEED
-            if event.key == pygame.K_RIGHT:
-                rect_change_x = SPEED
-            if event.key == pygame.K_SPACE:
-                rect_change_y = -JUMP_SPEED
+            player.handle_key_press(event.key)
         if event.type == pygame.KEYUP:
-            if event.key == pygame.K_LEFT and rect_change_x < 0:
-                rect_change_x = 0
-            if event.key == pygame.K_RIGHT and rect_change_x > 0:
-                rect_change_x = 0
+            player.handle_key_release(event.key)
 
     screen.fill(BLACK)
-
-    rect_x += rect_change_x
-    rect_y += rect_change_y
-    rect_change_y += GRAVITY
-
-    if rect_y + 50 >= platform_y:
-        rect_y = platform_y - 50 - 1
-        rect_change_y = 0
-
-    if rect_y < 0:
-        rect_y = 0
-        rect_change_y = 0
-
-    if rect_x < 0:
-        rect_x = 0
-    if rect_x + 50 >= WINDOW_WIDTH:
-        rect_x = WINDOW_WIDTH - 50
-
-    pygame.draw.rect(screen, WHITE, (rect_x, rect_y, 50, 50))
+    player.update()
     pygame.draw.rect(screen, WHITE, (0, platform_y, WINDOW_WIDTH, 50))
-
+    player.draw(screen)
     pygame.display.flip()
-
-    clock = pygame.time.Clock()
-    clock.tick(60)
+    pygame.time.Clock().tick(60)
 
 pygame.quit()
+
