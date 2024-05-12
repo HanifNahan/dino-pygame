@@ -8,7 +8,17 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 BLACK, WHITE = (0, 0, 0), (255, 255, 255)
 GRAVITY, SPEED, JUMP_SPEED = 0.5, 5, 10
 
-platform_y = WINDOW_HEIGHT - 50
+class Platform(pygame.sprite.Sprite):
+    def __init__(self, x, y, width, height):
+        super().__init__()
+        self.image = pygame.Surface([width, height])
+        self.image.fill(WHITE)
+        self.rect = self.image.get_rect(topleft=(x, y))
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+
+platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -33,8 +43,8 @@ class Player(pygame.sprite.Sprite):
         self.rect.x += self.change[0]
         self.change[1] += GRAVITY
         self.rect.y += self.change[1]
-        if self.rect.y + 50 >= platform_y:
-            self.rect.y = platform_y - 50 - 1
+        if self.rect.y + 80 >= platform.rect.y:
+            self.rect.y = platform.rect.y - 80 - 1
             self.change[1] = 0
         if self.rect.y < 0:
             self.rect.y = 0
@@ -43,7 +53,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = 0
         if self.rect.x + 50 >= WINDOW_WIDTH:
             self.rect.x = WINDOW_WIDTH - 50
-        if self.rect.y > 375:
+        if self.rect.y > 345:
             self.is_grounded = True
             self.is_jumping = False
         if self.is_jumping:
@@ -94,7 +104,7 @@ while running:
 
     screen.fill(BLACK)
     player.update()
-    pygame.draw.rect(screen, WHITE, (0, platform_y, WINDOW_WIDTH, 50))
+    platform.draw(screen)
     player.draw(screen)
     pygame.display.flip()
     pygame.time.Clock().tick(60)
