@@ -13,10 +13,21 @@ platform_y = WINDOW_HEIGHT - 50
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([50, 50])
-        self.image.fill(WHITE)
+        self.images = []
+        for i in range(1, 5):
+            image = pygame.image.load(f'assets/walk_{i}.png').convert_alpha()
+            image = pygame.transform.scale(image, (100, 100))
+            self.images.append(image)
+        self.jump_image = pygame.image.load('assets/jump.png').convert_alpha()
+        self.jump_image = pygame.transform.scale(self.jump_image, (100, 100))
+        self.index = 0
+        self.image = self.images[self.index]
         self.rect = self.image.get_rect(topleft=(100, 100))
         self.change = [0, 0]
+        self.fps = 10
+        self.clock = pygame.time.Clock()
+        self.is_grounded = False
+        self.is_jumping = False
 
     def update(self):
         self.rect.x += self.change[0]
@@ -32,8 +43,25 @@ class Player(pygame.sprite.Sprite):
             self.rect.x = 0
         if self.rect.x + 50 >= WINDOW_WIDTH:
             self.rect.x = WINDOW_WIDTH - 50
+        if self.rect.y > 375:
+            self.is_grounded = True
+            self.is_jumping = False
+        if self.is_jumping:
+            self.image = self.jump_image
+        else:
+            self.run()
+
+    def run(self):
+        now = pygame.time.get_ticks()
+        if now - self.clock.get_time() > self.fps:
+            self.clock.tick()
+            self.index += 0.2
+            if self.index >= len(self.images):
+                self.index = 0
+            self.image = self.images[int(self.index)]
 
     def jump(self):
+        self.is_jumping = True
         self.change[1] = -JUMP_SPEED
 
     def draw(self, surface):
@@ -44,8 +72,9 @@ class Player(pygame.sprite.Sprite):
             self.change[0] = -SPEED
         elif key == pygame.K_RIGHT:
             self.change[0] = SPEED
-        elif key == pygame.K_SPACE:
+        elif key == pygame.K_SPACE and self.is_grounded:
             self.jump()
+            self.is_grounded = False
 
     def handle_key_release(self, key):
         if key in (pygame.K_LEFT, pygame.K_RIGHT):
@@ -71,4 +100,5 @@ while running:
     pygame.time.Clock().tick(60)
 
 pygame.quit()
+
 
