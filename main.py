@@ -62,7 +62,7 @@ class Player(pygame.sprite.Sprite):
         self.jump_image = pygame.transform.scale(self.jump_image, (new_width, 150))
         self.index = 0
         self.image = self.images[self.index]
-        self.rect = self.image.get_rect(topleft=(100, 100))
+        self.rect = pygame.Rect(100, 75, 70, 120)
         self.change = [0, 0]
         self.fps = 10
         self.clock = pygame.time.Clock()
@@ -94,6 +94,7 @@ class Player(pygame.sprite.Sprite):
         for obstacle in obstacles:
             if self.rect.colliderect(obstacle):
                 self.is_grounded = False
+                game_over()
 
     def run(self):
         now = pygame.time.get_ticks()
@@ -109,6 +110,7 @@ class Player(pygame.sprite.Sprite):
         self.change[1] = -JUMP_SPEED
 
     def draw(self, surface):
+        # pygame.draw.rect(surface, (255, 0, 0), self.rect, 2) # Draw collision box
         surface.blit(self.image, self.rect)
 
     def handle_key_press(self, key):
@@ -123,6 +125,39 @@ class Player(pygame.sprite.Sprite):
     def handle_key_release(self, key):
         if key in (pygame.K_LEFT, pygame.K_RIGHT):
             self.change[0] = 0
+
+def game_over():
+    global running, obstacles, player
+
+    font = pygame.font.SysFont('comicsans', 36)
+    text = font.render("Game Over", True, WHITE)
+    text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50))
+    screen.blit(text, text_rect)
+
+    replay_button = pygame.Rect(WINDOW_WIDTH // 2 - 70, WINDOW_HEIGHT // 2, 140, 60)
+    pygame.draw.rect(screen, WHITE, replay_button)
+    replay_text = font.render("Replay", True, LIGHT_BLUE)
+    replay_text_rect = replay_text.get_rect(center=replay_button.center)
+    screen.blit(replay_text, replay_text_rect)
+
+    pygame.display.flip()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                if replay_button.collidepoint(mouse_pos):
+                    restart_game()
+                    return
+                
+def restart_game():
+    global obstacles, player
+    obstacles = pygame.sprite.Group()
+    player = Player()
+    running = True
 
 player = Player()
 
