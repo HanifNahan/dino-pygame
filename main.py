@@ -14,6 +14,7 @@ PLATFORM_WIDTH, PLATFORM_HEIGHT = 720, 50
 spawn_time = time.time()
 MIN_SPAWN_INTERVAL = 1.0
 MAX_SPAWN_INTERVAL = 20.0
+SCORE = 0
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -125,6 +126,11 @@ class Player(pygame.sprite.Sprite):
     def handle_key_release(self, key):
         if key in (pygame.K_LEFT, pygame.K_RIGHT):
             self.change[0] = 0
+            
+def display_score(score):
+    font = pygame.font.SysFont('comicsans', 24)
+    text_surface = font.render(f"Score: {score}", True, (0, 0, 0))
+    screen.blit(text_surface, (10, 10))
 
 def game_over():
     global running, obstacles, player
@@ -172,6 +178,8 @@ while running:
             player.handle_key_release(event.key)
 
     screen.fill(LIGHT_BLUE)
+    display_score(SCORE)
+    SCORE += 1
     player.update()
     platform.draw(screen)
     for obstacle in obstacles:
