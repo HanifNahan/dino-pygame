@@ -9,7 +9,7 @@ screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 LIGHT_BLUE, WHITE = (135, 206, 250), (255, 255, 255)
 GRAVITY, SPEED, JUMP_SPEED = 0.4, 5, 10
-OBSTACLE_WIDTH, OBSTACLE_HEIGHT = 50, 50
+OBSTACLE_WIDTH, OBSTACLE_HEIGHT = 70, 70
 PLATFORM_WIDTH, PLATFORM_HEIGHT = 720, 50
 spawn_time = time.time()
 MIN_SPAWN_INTERVAL = 1.0
@@ -29,8 +29,11 @@ class Platform(pygame.sprite.Sprite):
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([OBSTACLE_WIDTH, OBSTACLE_HEIGHT])
-        self.image.fill(WHITE)
+        self.index = random.randint(1, 4)
+        self.image = pygame.image.load(f'assets/obstacle_{self.index}.png').convert_alpha()
+        orig_width, orig_height = self.image.get_size()
+        new_width = orig_width * OBSTACLE_HEIGHT // orig_height
+        self.image = pygame.transform.scale(self.image, (new_width, OBSTACLE_HEIGHT))
         self.rect = self.image.get_rect(
             topleft=(random.randint(WINDOW_WIDTH, WINDOW_WIDTH + OBSTACLE_WIDTH),
                      WINDOW_HEIGHT - PLATFORM_HEIGHT - OBSTACLE_HEIGHT))
@@ -38,14 +41,12 @@ class Obstacle(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.x += self.change[0]
-        if self.rect.x + OBSTACLE_WIDTH <= 0:
+        if self.rect.x + self.rect.width <= 0:
             self.kill()
 
     def draw(self, surface):
+        pygame.draw.rect(surface, (255, 0, 0), self.rect, 2) # Draw collision box
         surface.blit(self.image, self.rect)
-
-platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
-obstacles = pygame.sprite.Group()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
@@ -166,6 +167,8 @@ def restart_game():
     running = True
 
 player = Player()
+platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
+obstacles = pygame.sprite.Group()
 
 running = True
 while running:
@@ -193,5 +196,6 @@ while running:
         obstacles.add(Obstacle())
 
 pygame.quit()
+
 
 
