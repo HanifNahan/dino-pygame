@@ -42,7 +42,7 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(
             topleft=(random.randint(WINDOW_WIDTH, WINDOW_WIDTH + OBSTACLE_WIDTH),
                      WINDOW_HEIGHT - PLATFORM_HEIGHT - OBSTACLE_HEIGHT))
-        self.speed = -5
+        self.speed = random.randint(-10, -5)
 
     def update(self):
         self.rect.x += self.speed
