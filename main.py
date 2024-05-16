@@ -166,10 +166,10 @@ def game_over():
                     return
                 
 def restart_game():
-    global obstacles, player
+    global obstacles, player, SCORE
     obstacles = pygame.sprite.Group()
     player = Player()
-    running = True
+    SCORE = 0
 
 player = Player()
 platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
@@ -178,6 +178,7 @@ obstacles = pygame.sprite.Group()
 running = True
 
 while running:
+    print(running)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
