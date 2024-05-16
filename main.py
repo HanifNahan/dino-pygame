@@ -8,7 +8,7 @@ WINDOW_WIDTH, WINDOW_HEIGHT = 720, 480
 screen = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 LIGHT_BLUE, WHITE = (135, 206, 250), (255, 255, 255)
-GRAVITY, SPEED, JUMP_SPEED = 0.4, 5, 10
+GRAVITY, SPEED, JUMP_SPEED = 0.4, 5, 12
 OBSTACLE_WIDTH, OBSTACLE_HEIGHT = 70, 70
 PLATFORM_WIDTH, PLATFORM_HEIGHT = 720, 50
 spawn_time = time.time()
@@ -42,10 +42,10 @@ class Obstacle(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(
             topleft=(random.randint(WINDOW_WIDTH, WINDOW_WIDTH + OBSTACLE_WIDTH),
                      WINDOW_HEIGHT - PLATFORM_HEIGHT - OBSTACLE_HEIGHT))
-        self.change = [-4, 0]
+        self.speed = -5
 
     def update(self):
-        self.rect.x += self.change[0]
+        self.rect.x += self.speed
         if self.rect.x + self.rect.width <= 0:
             self.kill()
 
