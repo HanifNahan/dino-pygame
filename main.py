@@ -21,6 +21,12 @@ background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
 bg_rect = background.get_rect()
 bg_x = 0
 
+
+pygame.mixer.init()
+pygame.mixer.music.load('assets/bg_music.wav')
+pygame.mixer.music.play(-1)
+pygame.mixer.music.set_volume(0.4)
+
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -141,6 +147,7 @@ def display_score(score):
 def game_over():
     global running, obstacles, player
 
+    pygame.mixer.music.stop()
     font = pygame.font.SysFont('comicsans', 36)
     text = font.render("Game Over", True, WHITE)
     text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50))
@@ -163,6 +170,7 @@ def game_over():
                 mouse_pos = pygame.mouse.get_pos()
                 if replay_button.collidepoint(mouse_pos):
                     restart_game()
+                    pygame.mixer.music.play(-1)
                     return
                 
 def restart_game():
