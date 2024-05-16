@@ -24,8 +24,8 @@ bg_x = 0
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
-        self.image = pygame.Surface([width, height])
-        self.image.fill(WHITE)
+        self.image = pygame.image.load('assets/platform.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect(topleft=(x, y))
 
     def draw(self, surface):
@@ -172,13 +172,16 @@ def restart_game():
     SCORE = 0
 
 player = Player()
-platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
+platforms = []
+num_platforms = WINDOW_WIDTH // PLATFORM_WIDTH + 2
+for i in range(num_platforms):
+    platform = Platform(i * PLATFORM_WIDTH, WINDOW_HEIGHT - PLATFORM_HEIGHT, PLATFORM_WIDTH, PLATFORM_HEIGHT)
+    platforms.append(platform)
 obstacles = pygame.sprite.Group()
 
 running = True
 
 while running:
-    print(running)
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
@@ -187,7 +190,7 @@ while running:
         if event.type == pygame.KEYUP:
             player.handle_key_release(event.key)
 
-    bg_x -= 1
+    bg_x -= 2
     if bg_x <= -WINDOW_WIDTH:
         bg_x = 0
 
@@ -201,7 +204,11 @@ while running:
     player.update()
     player.draw(screen)
 
-    platform.draw(screen)
+    for platform in platforms:
+        platform.rect.x -= 3
+        if platform.rect.right < 0:
+            platform.rect.x = WINDOW_WIDTH
+        platform.draw(screen)
 
     for obstacle in obstacles:
         obstacle.update()
