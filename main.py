@@ -18,6 +18,8 @@ SCORE = 0
 
 background = pygame.image.load('assets/bg.jpg').convert()
 background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
+bg_rect = background.get_rect()
+bg_x = 0
 
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
@@ -184,22 +186,31 @@ while running:
         if event.type == pygame.KEYUP:
             player.handle_key_release(event.key)
 
-    screen.blit(background, (0,0))
+    bg_x -= 1
+    if bg_x <= -WINDOW_WIDTH:
+        bg_x = 0
+
+    screen.fill((255, 255, 255))
+    screen.blit(background, (bg_x, 0))
+    screen.blit(background, (bg_x + WINDOW_WIDTH, 0))
+
     display_score(SCORE)
     SCORE += 1
+
     player.update()
+    player.draw(screen)
+
     platform.draw(screen)
+
     for obstacle in obstacles:
         obstacle.update()
         obstacle.draw(screen)
-    player.draw(screen)
+
     pygame.display.flip()
     pygame.time.Clock().tick(60)
+
     if len(obstacles) < 10 and time.time() - spawn_time > random.uniform(MIN_SPAWN_INTERVAL, MAX_SPAWN_INTERVAL):
         spawn_time = time.time()
         obstacles.add(Obstacle())
 
 pygame.quit()
-
-
-
