@@ -16,6 +16,9 @@ MIN_SPAWN_INTERVAL = 1.0
 MAX_SPAWN_INTERVAL = 20.0
 SCORE = 0
 
+background = pygame.image.load('assets/bg.jpg').convert()
+background = pygame.transform.scale(background, (WINDOW_WIDTH, WINDOW_HEIGHT))
+
 class Platform(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
         super().__init__()
@@ -45,7 +48,7 @@ class Obstacle(pygame.sprite.Sprite):
             self.kill()
 
     def draw(self, surface):
-        pygame.draw.rect(surface, (255, 0, 0), self.rect, 2) # Draw collision box
+        # pygame.draw.rect(surface, (255, 0, 0), self.rect, 2) # Draw collision box
         surface.blit(self.image, self.rect)
 
 class Player(pygame.sprite.Sprite):
@@ -171,6 +174,7 @@ platform = Platform(0, WINDOW_HEIGHT - 50, WINDOW_WIDTH, 50)
 obstacles = pygame.sprite.Group()
 
 running = True
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -180,7 +184,7 @@ while running:
         if event.type == pygame.KEYUP:
             player.handle_key_release(event.key)
 
-    screen.fill(LIGHT_BLUE)
+    screen.blit(background, (0,0))
     display_score(SCORE)
     SCORE += 1
     player.update()
